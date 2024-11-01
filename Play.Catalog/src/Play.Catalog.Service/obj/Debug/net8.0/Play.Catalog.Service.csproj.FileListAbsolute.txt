@@ -30,3 +30,4 @@
 /Users/naufilshaikh/Dev/NET/microservices-net/Play.Catalog/src/Play.Catalog.Service/obj/Debug/net8.0/Play.Catalog.Service.pdb
 /Users/naufilshaikh/Dev/NET/microservices-net/Play.Catalog/src/Play.Catalog.Service/obj/Debug/net8.0/Play.Catalog.Service.genruntimeconfig.cache
 /Users/naufilshaikh/Dev/NET/microservices-net/Play.Catalog/src/Play.Catalog.Service/obj/Debug/net8.0/ref/Play.Catalog.Service.dll
+/Users/naufilshaikh/Dev/NET/microservices-net/Play.Catalog/src/Play.Catalog.Service/obj/Debug/net8.0/Play.Catalog.Service.sourcelink.json
