@@ -5,7 +5,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Play.Common.Settings;
-using Play.Service.Settings;
 
 namespace Play.Common.MongoDB
 {
