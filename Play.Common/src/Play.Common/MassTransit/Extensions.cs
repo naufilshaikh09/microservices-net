@@ -9,7 +9,7 @@ namespace Play.Common.MassTransit
 {
     public static class Extensions
     {
-        public static IServiceCollection AddMassTransitWithRabbitMq(this IServiceCollection services, string host)
+        public static IServiceCollection AddMassTransitWithRabbitMq(this IServiceCollection services)
         {
             services.AddMassTransit(configure =>
             {
