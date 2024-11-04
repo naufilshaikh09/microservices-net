@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Play.Catalog.Service.Entities;
+using Play.Common.Identity;
 using Play.Common.MongoDB;
 using Play.Common.MassTransit;
 using Play.Common.Settings;
@@ -13,14 +14,8 @@ var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).
 builder.Services
     .AddMongo()
     .AddMongoRepository<Item>("items")
-    .AddMassTransitWithRabbitMq();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://localhost:5003";
-        options.Audience = serviceSettings.ServiceName;
-    });
+    .AddMassTransitWithRabbitMq()
+    .AddJwtBearerAuthentication();
 
 builder.Services.AddControllers(options =>
 {
