@@ -32,6 +32,8 @@ builder.Services.AddIdentityServer(options =>
     .AddInMemoryIdentityResources(identityServerSettings.IdentityResources)
     .AddDeveloperSigningCredential();
 
+builder.Services.AddLocalApiAuthentication();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
