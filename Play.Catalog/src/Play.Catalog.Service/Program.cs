@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+var allowedOriginSettings = "AllowedOrigin";
 var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 
 builder.Services
@@ -48,6 +49,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(builder => builder
+        .WithOrigins(app.Configuration[allowedOriginSettings])
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 }
 
 app.UseHttpsRedirection();

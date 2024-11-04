@@ -5,6 +5,8 @@ using Play.Common.MongoDB;
 using Play.Inventory.Service;
 using Play.Inventory.Service.Entities;
 
+var allowedOriginSetting = "AllowedOrigin";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -30,6 +32,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(builder =>
+    {
+        builder.WithOrigins(app.Configuration[allowedOriginSetting])
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 }
 
 app.UseHttpsRedirection();
