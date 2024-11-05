@@ -1,9 +1,11 @@
+using GreenPipes;
 using MassTransit;
 using Play.Common.Identity;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
 using Play.Inventory.Service;
 using Play.Inventory.Service.Entities;
+using Play.Inventory.Service.Exceptions;
 
 var allowedOriginSetting = "AllowedOrigin";
 
@@ -15,7 +17,11 @@ builder.Services
     .AddMongo()
     .AddMongoRepository<InventoryItem>("inventoryItems")
     .AddMongoRepository<CatalogItem>("catalogItems")
-    .AddMassTransitWithRabbitMq()
+    .AddMassTransitWithRabbitMq(retryConfigurator =>
+    {
+        retryConfigurator.Interval(3, TimeSpan.FromSeconds(5));
+        retryConfigurator.Ignore(typeof(UnknownItemException));
+    })
     .AddJwtBearerAuthentication();
 
 builder.AddCatalogClientConfig();
