@@ -43,14 +43,23 @@ public class GrantItemsConsumer : IConsumer<GrantItems>
                 AcquiredDate = DateTimeOffset.UtcNow
             };
             
+            inventoryItem.MessagedIds.Add(context.MessageId.Value);
+            
             await inventoryItemsRepository.CreateAsync(inventoryItem);
         }
         else
         {
+            if(inventoryItem.MessagedIds.Contains(context.MessageId.Value))
+            {
+                await context.Publish(new InventoryItemsGranted(message.CorrelationId));
+                return;
+            }
+            
             inventoryItem.Quantity += message.Quantity;
+            inventoryItem.MessagedIds.Add(context.MessageId.Value);
             await inventoryItemsRepository.UpdateAsync(inventoryItem);
         }
-        
+
         await context.Publish(new InventoryItemsGranted(message.CorrelationId));
     }
 }

@@ -29,6 +29,7 @@ public class PurchaseStateMachine : MassTransitStateMachine<PurchaseState>
         ConfigureAccepted();
         ConfigureItemsGranted();
         ConfigureFaulted();
+        ConfigureCompleted();
     }
     
     private void ConfigureEvents()
@@ -75,6 +76,7 @@ public class PurchaseStateMachine : MassTransitStateMachine<PurchaseState>
     private void ConfigureAccepted()
     {
         During(Accepted,
+            Ignore(PurchaseRequested),
             When(InventoryItemsGranted)
                 .Then(context =>
                 {
@@ -99,6 +101,8 @@ public class PurchaseStateMachine : MassTransitStateMachine<PurchaseState>
     private void ConfigureItemsGranted()
     {
         During(ItemsGranted,
+            Ignore(PurchaseRequested),
+            Ignore(InventoryItemsGranted),
             When(GilDebited)
                 .Then(context =>
                 {
@@ -126,6 +130,15 @@ public class PurchaseStateMachine : MassTransitStateMachine<PurchaseState>
         DuringAny(
             When(GetPurchaseState)
                 .Respond(context => context.Instance)
+        );
+    }
+    
+    private void ConfigureCompleted()
+    {
+        During(Completed,
+            Ignore(PurchaseRequested),
+            Ignore(InventoryItemsGranted),
+            Ignore(GilDebited)
         );
     }
     
