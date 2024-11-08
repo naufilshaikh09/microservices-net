@@ -6,6 +6,7 @@ using Play.Common.Identity;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
 using Play.Common.Settings;
+using Play.Identity.Contracts;
 using Play.Inventory.Contracts;
 using Play.Trading.Service.Entities;
 using Play.Trading.Service.Exceptions;
@@ -62,7 +63,10 @@ void AddMassTransit(IServiceCollection services)
         });
         
         config.AddConsumers(Assembly.GetEntryAssembly());
-        config.AddSagaStateMachine<PurchaseStateMachine, PurchaseState>()
+        config.AddSagaStateMachine<PurchaseStateMachine, PurchaseState>(sagaConfigurator =>
+            {
+                sagaConfigurator.UseInMemoryOutbox();
+            })
             .MongoDbRepository(r =>
             {
                 var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings))
@@ -78,6 +82,7 @@ void AddMassTransit(IServiceCollection services)
             .Get<QueueSettings>();
         
         EndpointConvention.Map<Contracts.GrantItems>(new Uri(queueSettings.GrantItemsQueueAddress));
+        EndpointConvention.Map<DebitGil>(new Uri(queueSettings.DebitGillQueueAddress));
         
         services.AddMassTransitHostedService();
         services.AddGenericRequestClient();
