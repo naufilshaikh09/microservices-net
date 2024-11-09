@@ -1,22 +1,21 @@
 using System.Text.Json;
 using Play.Inventory.Service.Dtos;
 
-namespace Play.Inventory.Service.Clients
+namespace Play.Inventory.Service.Clients;
+
+public class CatalogClient
 {
-    public class CatalogClient
+    private readonly HttpClient _httpClient;
+
+    public CatalogClient(HttpClient httpClient)
     {
-        private readonly HttpClient _httpClient;
+        _httpClient = httpClient;
+    }
 
-        public CatalogClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+    public async Task<IReadOnlyCollection<CatalogItemDto>> GetCatalogItemsAsync()
+    {
+        var response = await _httpClient.GetFromJsonAsync<IReadOnlyCollection<CatalogItemDto>>("/items/");
 
-        public async Task<IReadOnlyCollection<CatalogItemDto>> GetCatalogItemsAsync()
-        {
-            var response = await _httpClient.GetFromJsonAsync<IReadOnlyCollection<CatalogItemDto>>("/items/");
-
-            return response;
-        }
+        return response;
     }
 }

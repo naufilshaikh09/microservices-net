@@ -1,11 +1,10 @@
 import React from 'react';
-import { Button, Form, Alert, Spinner } from 'react-bootstrap';
-import { v4 as uuidv4 } from 'uuid';
-import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import {Alert, Button, Form, Spinner} from 'react-bootstrap';
+import {v4 as uuidv4} from 'uuid';
+import {HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 import authService from '../api-authorization/AuthorizeService';
 
-export default class PurchaseForm extends React.Component
-{
+export default class PurchaseForm extends React.Component {
     state = {
         id: 0,
         name: '',
@@ -20,60 +19,50 @@ export default class PurchaseForm extends React.Component
     }
 
     connection = new HubConnectionBuilder()
-        .withUrl(`${window.TRADING_SERVICE_URL}/messageHub`, { accessTokenFactory: () => authService.getAccessToken() })
+        .withUrl(`${window.TRADING_SERVICE_URL}/messageHub`, {accessTokenFactory: () => authService.getAccessToken()})
         .withAutomaticReconnect()
         .configureLogging(LogLevel.Information)
         .build();
 
-    componentDidMount()
-    {
-        const { id, name, price } = this.props.item
-        this.setState({ id, name, price });
+    componentDidMount() {
+        const {id, name, price} = this.props.item
+        this.setState({id, name, price});
 
         this.connection.on("ReceivePurchaseStatus", this.onPurchaseStatusReceived);
 
         this.connection.start()
-            .catch(err =>
-            {
+            .catch(err => {
                 console.log('connection error');
             });
     }
 
-    onChange = e =>
-    {
-        this.setState({ [e.target.name]: e.target.value })
+    onChange = e => {
+        this.setState({[e.target.name]: e.target.value})
     }
 
-    submitPurchase = (e) =>
-    {
+    submitPurchase = (e) => {
         e.preventDefault();
 
         const form = e.currentTarget;
-        if (form.checkValidity() === false)
-        {
+        if (form.checkValidity() === false) {
             e.stopPropagation();
-        }
-        else
-        {
+        } else {
             this.purchaseItem();
         }
 
-        this.setState({ validated: true });
+        this.setState({validated: true});
     }
 
-    async purchaseItem()
-    {
+    async purchaseItem() {
         let confirmPurchase = window.confirm(`Purchase ${this.state.quantity} ${this.state.name} for ${this.state.price * this.state.quantity} gil?`);
-        if (confirmPurchase)
-        {
-            this.setState({ buttonDisabled: true, isLoading: true, alertVisible: false })
+        if (confirmPurchase) {
+            this.setState({buttonDisabled: true, isLoading: true, alertVisible: false})
             var idempotencyId = uuidv4();
             this.fetchRetry(idempotencyId, 3);
         }
     }
 
-    async fetchRetry(idempotencyId, tries)
-    {
+    async fetchRetry(idempotencyId, tries) {
         const token = await authService.getAccessToken();
 
         return fetch(`${window.PURCHASE_API_URL}`, {
@@ -88,10 +77,8 @@ export default class PurchaseForm extends React.Component
                 idempotencyId: idempotencyId
             })
         })
-            .then(async response =>
-            {
-                if (!response.ok)
-                {
+            .then(async response => {
+                if (!response.ok) {
                     const errorData = await response.json();
                     console.error(errorData);
                     throw new Error(`Could not purchase the item: ${errorData.title}`);
@@ -100,11 +87,9 @@ export default class PurchaseForm extends React.Component
                 console.log('Purchase request completed with status ' + response.status);
                 return response.json();
             })
-            .catch(err => 
-            {
+            .catch(err => {
                 var triesLeft = tries - 1;
-                if (!triesLeft)
-                {
+                if (!triesLeft) {
                     this.setState({
                         alertMessage: err.message,
                         alertColor: "danger",
@@ -119,22 +104,18 @@ export default class PurchaseForm extends React.Component
             });
     }
 
-    onPurchaseStatusReceived = (status) =>
-    {
+    onPurchaseStatusReceived = (status) => {
         console.log('Received purchase status: ' + status.currentState);
-        this.setState({ isLoading: false })
+        this.setState({isLoading: false})
 
-        if (status.currentState === "Faulted")
-        {
+        if (status.currentState === "Faulted") {
             this.setState({
                 alertMessage: "Could not purchase the item(s). " + status.errorMessage,
                 alertColor: "danger",
                 buttonDisabled: false
             });
             this.showAlert(false);
-        }
-        else
-        {
+        } else {
             this.props.updateItemIntoState(this.state.id);
             this.setState({
                 alertMessage: "Item(s) successfully purchased!",
@@ -144,44 +125,40 @@ export default class PurchaseForm extends React.Component
         }
     }
 
-    showAlert = (autoDismiss) =>
-    {
-        this.setState({ alertVisible: true }, () =>
-        {
-            if (autoDismiss)
-            {
-                window.setTimeout(() =>
-                {
+    showAlert = (autoDismiss) => {
+        this.setState({alertVisible: true}, () => {
+            if (autoDismiss) {
+                window.setTimeout(() => {
                     this.props.toggle();
                 }, 2000)
             }
         });
     }
 
-    render()
-    {
+    render() {
         return <Form noValidate validated={this.state.validated} onSubmit={this.submitPurchase}>
             <Form.Group>
                 <Form.Label htmlFor="price">Price:</Form.Label>
-                <Form.Control type="number" name="price" value={this.state.price} readOnly />
+                <Form.Control type="number" name="price" value={this.state.price} readOnly/>
             </Form.Group>
             <Form.Group>
                 <Form.Label htmlFor="quantity">Quantity:</Form.Label>
-                <Form.Control type="number" name="quantity" onChange={this.onChange} value={this.state.quantity} required />
+                <Form.Control type="number" name="quantity" onChange={this.onChange} value={this.state.quantity}
+                              required/>
                 <Form.Control.Feedback type="invalid">The Quantity field is required</Form.Control.Feedback>
             </Form.Group>
 
-            <Button variant="primary" type="submit" disabled={this.state.buttonDisabled} >
+            <Button variant="primary" type="submit" disabled={this.state.buttonDisabled}>
                 {this.state.isLoading ? <Spinner
                     as="span"
                     animation="border"
                     size="sm"
                     role="status"
-                    aria-hidden="true" /> : ''}
+                    aria-hidden="true"/> : ''}
                 {this.state.isLoading ? ' Purchasing…' : 'Purchase'}
             </Button>
 
-            <Alert style={{ marginTop: "10px" }} variant={this.state.alertColor} show={this.state.alertVisible}>
+            <Alert style={{marginTop: "10px"}} variant={this.state.alertColor} show={this.state.alertVisible}>
                 {this.state.alertMessage}
             </Alert>
         </Form>;

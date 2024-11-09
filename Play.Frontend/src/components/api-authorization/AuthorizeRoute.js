@@ -1,7 +1,6 @@
-import React from 'react'
-import { Component } from 'react'
-import { Route, Redirect } from 'react-router-dom'
-import { AuthorizationPaths, QueryParameterNames } from './ApiAuthorizationConstants'
+import React, {Component} from 'react'
+import {Redirect, Route} from 'react-router-dom'
+import {AuthorizationPaths, QueryParameterNames} from './ApiAuthorizationConstants'
 import authService from './AuthorizeService'
 
 export default class AuthorizeRoute extends Component {
@@ -24,7 +23,7 @@ export default class AuthorizeRoute extends Component {
     }
 
     render() {
-        const { ready, authenticated } = this.state;
+        const {ready, authenticated} = this.state;
         var link = document.createElement("a");
         link.href = this.props.path;
         const returnUrl = `${link.protocol}//${link.host}${link.pathname}${link.search}${link.hash}`;
@@ -32,25 +31,25 @@ export default class AuthorizeRoute extends Component {
         if (!ready) {
             return <div></div>;
         } else {
-            const { component: Component, ...rest } = this.props;
+            const {component: Component, ...rest} = this.props;
             return <Route {...rest}
-                render={(props) => {
-                    if (authenticated) {
-                        return <Component {...props} />
-                    } else {
-                        return <Redirect to={redirectUrl} />
-                    }
-                }} />
+                          render={(props) => {
+                              if (authenticated) {
+                                  return <Component {...props} />
+                              } else {
+                                  return <Redirect to={redirectUrl}/>
+                              }
+                          }}/>
         }
     }
 
     async populateAuthenticationState() {
         const authenticated = await authService.isAuthenticated();
-        this.setState({ ready: true, authenticated });
+        this.setState({ready: true, authenticated});
     }
 
     async authenticationChanged() {
-        this.setState({ ready: false, authenticated: false });
+        this.setState({ready: false, authenticated: false});
         await this.populateAuthenticationState();
     }
 }

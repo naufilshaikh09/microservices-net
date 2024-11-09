@@ -1,9 +1,8 @@
 import React from 'react';
-import { Button, Form, Alert } from 'react-bootstrap';
+import {Alert, Button, Form} from 'react-bootstrap';
 import authService from '../api-authorization/AuthorizeService'
 
-export default class GrantItemForm extends React.Component
-{
+export default class GrantItemForm extends React.Component {
     state = {
         id: '',
         userId: '',
@@ -12,38 +11,31 @@ export default class GrantItemForm extends React.Component
         validated: false
     }
 
-    componentDidMount()
-    {
-        if (this.props.item)
-        {
-            const { id } = this.props.item
-            this.setState({ id });
+    componentDidMount() {
+        if (this.props.item) {
+            const {id} = this.props.item
+            this.setState({id});
         }
     }
-    onChange = e =>
-    {
-        this.setState({ [e.target.name]: e.target.value })
+
+    onChange = e => {
+        this.setState({[e.target.name]: e.target.value})
     }
 
-    submitGrant = (e) =>
-    {
+    submitGrant = (e) => {
         e.preventDefault();
 
         const form = e.currentTarget;
-        if (form.checkValidity() === false)
-        {
+        if (form.checkValidity() === false) {
             e.stopPropagation();
-        }
-        else
-        {
+        } else {
             this.grantItem();
         }
 
-        this.setState({ validated: true });
+        this.setState({validated: true});
     }
 
-    async grantItem()
-    {
+    async grantItem() {
         const token = await authService.getAccessToken();
         fetch(`${window.INVENTORY_ITEMS_API_URL}`, {
             method: 'post',
@@ -57,10 +49,8 @@ export default class GrantItemForm extends React.Component
                 quantity: parseInt(this.state.quantity)
             })
         })
-            .then(async response =>
-            {
-                if (!response.ok)
-                {
+            .then(async response => {
+                if (!response.ok) {
                     const errorData = await response.json();
                     console.error(errorData);
                     throw new Error(`Could not grant the item: ${errorData.title}`);
@@ -68,14 +58,12 @@ export default class GrantItemForm extends React.Component
 
                 this.props.toggle();
             })
-            .catch(err => 
-            {
+            .catch(err => {
                 this.showAlert(err.message);
             });
     }
 
-    showAlert = (message) =>
-    {
+    showAlert = (message) => {
         this.setState({
             alertMessage: message,
             alertColor: "danger",
@@ -83,22 +71,22 @@ export default class GrantItemForm extends React.Component
         });
     }
 
-    render()
-    {
+    render() {
         return <Form noValidate validated={this.state.validated} onSubmit={this.submitGrant}>
             <Form.Group>
                 <Form.Label htmlFor="userId">User Id:</Form.Label>
-                <Form.Control type="text" name="userId" onChange={this.onChange} value={this.state.userId} required />
+                <Form.Control type="text" name="userId" onChange={this.onChange} value={this.state.userId} required/>
                 <Form.Control.Feedback type="invalid">The User Id field is required</Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
                 <Form.Label htmlFor="quantity">Quantity:</Form.Label>
-                <Form.Control type="number" name="quantity" onChange={this.onChange} value={this.state.quantity} required />
+                <Form.Control type="number" name="quantity" onChange={this.onChange} value={this.state.quantity}
+                              required/>
                 <Form.Control.Feedback type="invalid">The Quantity field is required</Form.Control.Feedback>
             </Form.Group>
             <Button variant="primary" type="submit">Grant</Button>
 
-            <Alert style={{ marginTop: "10px" }} variant={this.state.alertColor} show={this.state.alertVisible}>
+            <Alert style={{marginTop: "10px"}} variant={this.state.alertColor} show={this.state.alertVisible}>
                 {this.state.alertMessage}
             </Alert>
         </Form>;

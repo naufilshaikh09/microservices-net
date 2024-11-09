@@ -1,5 +1,5 @@
-import { UserManager, WebStorageStateStore } from 'oidc-client';
-import { ApplicationName, AuthorizationPaths } from './ApiAuthorizationConstants';
+import {UserManager, WebStorageStateStore} from 'oidc-client';
+import {ApplicationName, AuthorizationPaths} from './ApiAuthorizationConstants';
 
 export class AuthorizeService {
     _callbacks = [];
@@ -136,13 +136,13 @@ export class AuthorizeService {
     }
 
     subscribe(callback) {
-        this._callbacks.push({ callback, subscription: this._nextSubscriptionId++ });
+        this._callbacks.push({callback, subscription: this._nextSubscriptionId++});
         return this._nextSubscriptionId - 1;
     }
 
     unsubscribe(subscriptionId) {
         const subscriptionIndex = this._callbacks
-            .map((element, index) => element.subscription === subscriptionId ? { found: true, index } : { found: false })
+            .map((element, index) => element.subscription === subscriptionId ? {found: true, index} : {found: false})
             .filter(element => element.found === true);
         if (subscriptionIndex.length !== 1) {
             throw new Error(`Found an invalid number of subscriptions ${subscriptionIndex.length}`);
@@ -159,19 +159,19 @@ export class AuthorizeService {
     }
 
     createArguments(state) {
-        return { useReplaceToNavigate: true, data: state };
+        return {useReplaceToNavigate: true, data: state};
     }
 
     error(message) {
-        return { status: AuthenticationResultStatus.Fail, message };
+        return {status: AuthenticationResultStatus.Fail, message};
     }
 
     success(state) {
-        return { status: AuthenticationResultStatus.Success, state };
+        return {status: AuthenticationResultStatus.Success, state};
     }
 
     redirect() {
-        return { status: AuthenticationResultStatus.Redirect };
+        return {status: AuthenticationResultStatus.Redirect};
     }
 
     async ensureUserManagerInitialized() {
@@ -180,14 +180,14 @@ export class AuthorizeService {
         }
 
         var hostAndPort = window.location.origin
-        
+
         let settings = {
             authority: `${window.IDENTITY_SERVICE_URL}`,
             client_id: "frontend",
             redirect_uri: `${hostAndPort}${AuthorizationPaths.LoginCallback}`,
             response_type: "code",
-            scope:"openid profile catalog.fullaccess inventory.fullaccess trading.fullaccess IdentityServerApi roles",
-            post_logout_redirect_uri : `${hostAndPort}${AuthorizationPaths.LogOutCallback}`
+            scope: "openid profile catalog.fullaccess inventory.fullaccess trading.fullaccess IdentityServerApi roles",
+            post_logout_redirect_uri: `${hostAndPort}${AuthorizationPaths.LogOutCallback}`
         };
 
         settings.automaticSilentRenew = true;
@@ -204,7 +204,9 @@ export class AuthorizeService {
         });
     }
 
-    static get instance() { return authService }
+    static get instance() {
+        return authService
+    }
 }
 
 const authService = new AuthorizeService();

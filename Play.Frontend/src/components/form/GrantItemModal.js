@@ -1,19 +1,18 @@
-import React, { Component, Fragment } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React, {Component, Fragment} from 'react';
+import {Button, Modal} from 'react-bootstrap';
 import GrantItemForm from './GrantItemForm';
-export default class GrantItemModal extends Component
-{
+
+export default class GrantItemModal extends Component {
     state = {
         modal: false
     }
-    toggle = () =>
-    {
+    toggle = () => {
         this.setState(previous => ({
             modal: !previous.modal
         }));
     }
-    render()
-    {
+
+    render() {
         return <Fragment>
             <Button variant="primary" onClick={this.toggle}>Grant</Button>
             <Modal show={this.state.modal} className={this.props.className} onHide={this.toggle}>

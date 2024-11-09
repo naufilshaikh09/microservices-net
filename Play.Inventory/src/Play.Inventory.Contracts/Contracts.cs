@@ -1,5 +1,5 @@
 namespace Play.Inventory.Contracts
-{ 
+{
     public record GrantItems(
         Guid UserId,
         Guid CatalogItemId,
@@ -15,9 +15,9 @@ namespace Play.Inventory.Contracts
         Guid CorrelationId);
 
     public record InventoryItemsSubtracted(Guid CorrelationId);
-    
+
     public record InventoryItemUpdated(
         Guid UserId,
-        Guid CatalogItemId, 
+        Guid CatalogItemId,
         int NewTotalQuantity);
 }

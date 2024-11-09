@@ -13,8 +13,8 @@ namespace Play.Catalog.Service.Controllers;
 public class ItemController : ControllerBase
 {
     private const string AdminRole = "Admin";
-    private readonly IRepository<Item> repository;
     private readonly IPublishEndpoint publishEndpoint;
+    private readonly IRepository<Item> repository;
 
     public ItemController(IRepository<Item> repository, IPublishEndpoint publishEndpoint)
     {
@@ -36,10 +36,7 @@ public class ItemController : ControllerBase
     {
         var item = await repository.GetAsync(id);
 
-        if (item == null)
-        {
-            return NotFound();
-        }
+        if (item == null) return NotFound();
 
         return item.AsDto();
     }
@@ -59,9 +56,9 @@ public class ItemController : ControllerBase
         await repository.CreateAsync(item);
 
         await publishEndpoint.Publish(new CatalogItemCreated(
-            item.Id, 
-            item.Name, 
-            item.Description, 
+            item.Id,
+            item.Name,
+            item.Description,
             item.Price));
 
         return CreatedAtAction(nameof(GetByIdAsync), new { id = item.Id }, item);
@@ -73,10 +70,7 @@ public class ItemController : ControllerBase
     {
         var existingItem = await repository.GetAsync(id);
 
-        if (existingItem == null)
-        {
-            return NotFound();
-        }
+        if (existingItem == null) return NotFound();
 
         existingItem.Name = updateItemDto.Name;
         existingItem.Description = updateItemDto.Description;
@@ -99,10 +93,7 @@ public class ItemController : ControllerBase
     {
         var item = await repository.GetAsync(id);
 
-        if (item == null)
-        {
-            return NotFound();
-        }
+        if (item == null) return NotFound();
 
         await repository.RemoveAsync(item.Id);
 

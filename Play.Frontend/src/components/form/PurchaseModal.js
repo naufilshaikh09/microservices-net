@@ -1,19 +1,18 @@
-import React, { Component, Fragment } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React, {Component, Fragment} from 'react';
+import {Button, Modal} from 'react-bootstrap';
 import PurchaseForm from './PurchaseForm';
-export default class PurchaseModal extends Component
-{
+
+export default class PurchaseModal extends Component {
     state = {
         modal: false
     }
-    toggle = () =>
-    {
+    toggle = () => {
         this.setState(previous => ({
             modal: !previous.modal
         }));
     }
-    render()
-    {
+
+    render() {
         return <Fragment>
             <Button variant="primary" onClick={this.toggle}>Purchase</Button>
             <Modal show={this.state.modal} className={this.props.className} onHide={this.toggle} size="sm">
@@ -22,7 +21,7 @@ export default class PurchaseModal extends Component
                     <PurchaseForm
                         toggle={this.toggle}
                         item={this.props.item}
-                        updateItemIntoState={this.props.updateItemIntoState} />
+                        updateItemIntoState={this.props.updateItemIntoState}/>
                 </Modal.Body>
             </Modal>
         </Fragment>;

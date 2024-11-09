@@ -1,19 +1,18 @@
-import React, { Component, Fragment } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React, {Component, Fragment} from 'react';
+import {Button, Modal} from 'react-bootstrap';
 import UserForm from './UserForm';
-export default class UserModal extends Component
-{
+
+export default class UserModal extends Component {
     state = {
         modal: false
     }
-    toggle = () =>
-    {
+    toggle = () => {
         this.setState(previous => ({
             modal: !previous.modal
         }));
     }
-    render()
-    {
+
+    render() {
         let title = 'Edit User';
         return <Fragment>
             <Button
@@ -25,7 +24,7 @@ export default class UserModal extends Component
                     <UserForm
                         updateUserIntoState={this.props.updateUserIntoState}
                         toggle={this.toggle}
-                        user={this.props.user} />
+                        user={this.props.user}/>
                 </Modal.Body>
             </Modal>
         </Fragment>;

@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Play.Catalog.Service;
 using Play.Catalog.Service.Entities;
 using Play.Common.Identity;
-using Play.Common.MongoDB;
 using Play.Common.MassTransit;
+using Play.Common.MongoDB;
 using Play.Common.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +25,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin");
         policy.RequireClaim("scope", "catalog.readaccess", "catalog.fullaccess");
     });
-    
+
     options.AddPolicy(Policies.Write, policy =>
     {
         policy.RequireRole("Admin");
@@ -34,10 +33,7 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
-builder.Services.AddControllers(options =>
-{
-    options.SuppressAsyncSuffixInActionNames = false;
-});
+builder.Services.AddControllers(options => { options.SuppressAsyncSuffixInActionNames = false; });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

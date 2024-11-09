@@ -1,6 +1,7 @@
-import React, { Component, Fragment } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React, {Component, Fragment} from 'react';
+import {Button, Modal} from 'react-bootstrap';
 import ItemForm from './ItemForm';
+
 export default class ItemModal extends Component {
     state = {
         modal: false
@@ -10,6 +11,7 @@ export default class ItemModal extends Component {
             modal: !previous.modal
         }));
     }
+
     render() {
         const isNew = this.props.isNew;
         let title = 'Edit Item';
@@ -19,7 +21,7 @@ export default class ItemModal extends Component {
             button = <Button
                 variant="primary"
                 onClick={this.toggle}
-                style={{ minWidth: "200px" }}>Add</Button>;
+                style={{minWidth: "200px"}}>Add</Button>;
         } else {
             button = <Button
                 variant="primary"
@@ -34,7 +36,7 @@ export default class ItemModal extends Component {
                         addItemToState={this.props.addItemToState}
                         updateItemIntoState={this.props.updateItemIntoState}
                         toggle={this.toggle}
-                        item={this.props.item} />
+                        item={this.props.item}/>
                 </Modal.Body>
             </Modal>
         </Fragment>;
