@@ -19,7 +19,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMongo()
     .AddMongoRepository<CatalogItem>("catalogItems")
+    .AddMongoRepository<InventoryItem>("inventoryItems")
+    .AddMongoRepository<ApplicationUser>("users")
     .AddJwtBearerAuthentication();
+
 AddMassTransit(builder.Services);
 
 builder.Services.AddControllers(options =>
@@ -81,9 +84,9 @@ void AddMassTransit(IServiceCollection services)
         var queueSettings = builder.Configuration.GetSection(nameof(QueueSettings))
             .Get<QueueSettings>();
         
-        EndpointConvention.Map<Contracts.GrantItems>(new Uri(queueSettings.GrantItemsQueueAddress));
+        EndpointConvention.Map<GrantItems>(new Uri(queueSettings.GrantItemsQueueAddress));
         EndpointConvention.Map<DebitGil>(new Uri(queueSettings.DebitGillQueueAddress));
-        EndpointConvention.Map<Contracts.SubtractItems>(new Uri(queueSettings.SubstractItemsQueueAddress));
+        EndpointConvention.Map<SubtractItems>(new Uri(queueSettings.SubstractItemsQueueAddress));
         
         services.AddMassTransitHostedService();
         services.AddGenericRequestClient();

@@ -15,9 +15,9 @@ public class PurchaseStateMachine : MassTransitStateMachine<PurchaseState>
     
     public Event<PurchaseRequested> PurchaseRequested { get; }
     public Event<GetPurchaseState> GetPurchaseState { get; }
-    public Event<Inventory.Contracts.Contracts.InventoryItemsGranted> InventoryItemsGranted { get; }
+    public Event<Inventory.Contracts.InventoryItemsGranted> InventoryItemsGranted { get; }
     public Event<GilDebited> GilDebited { get; }
-    public Event<Fault<Inventory.Contracts.Contracts.GrantItems>> GrantItemsFaulted { get; }
+    public Event<Fault<Inventory.Contracts.GrantItems>> GrantItemsFaulted { get; }
     public Event<Fault<DebitGil>> DebitGilFaulted { get; }
     
     public PurchaseStateMachine()
@@ -57,7 +57,7 @@ public class PurchaseStateMachine : MassTransitStateMachine<PurchaseState>
                     context.Instance.LastUpdated = context.Instance.Received;
                 })
                 .Activity(x => x.OfType<CalculatePurchaseTotalActivity>())
-                .Send(context => new Inventory.Contracts.Contracts.GrantItems(
+                .Send(context => new Inventory.Contracts.GrantItems(
                     context.Instance.UserId,
                     context.Instance.ItemId,
                     context.Instance.Quantity,
@@ -110,7 +110,7 @@ public class PurchaseStateMachine : MassTransitStateMachine<PurchaseState>
                 })
                 .TransitionTo(Completed),
             When(DebitGilFaulted)
-                .Send(context => new Inventory.Contracts.Contracts.SubtractItems(
+                .Send(context => new Inventory.Contracts.SubtractItems(
                     context.Instance.UserId,
                     context.Instance.ItemId,
                     context.Instance.Quantity,

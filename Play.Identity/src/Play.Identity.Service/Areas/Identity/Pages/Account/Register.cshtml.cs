@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Play.Identity.Contracts;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Settings;
 
@@ -34,6 +36,7 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly IdentitySettings _identitySettings;
+        private readonly IPublishEndpoint _publishEndpoint;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -41,7 +44,8 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            IOptions<IdentitySettings> identityOptions)
+            IOptions<IdentitySettings> identityOptions,
+            IPublishEndpoint publishEndpoint)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -50,6 +54,7 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _identitySettings = identityOptions.Value;
+            _publishEndpoint = publishEndpoint;
         }
 
         /// <summary>
@@ -132,7 +137,13 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
                     
                     await _userManager.AddToRoleAsync(user, Roles.Player);
                     _logger.LogInformation($"User added to the role {Roles.Player} role.");
-
+                    
+                    await _publishEndpoint.Publish(new UserUpdated(
+                        user.Id,
+                        user.Email,
+                        user.Gil
+                    ));
+                    
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
