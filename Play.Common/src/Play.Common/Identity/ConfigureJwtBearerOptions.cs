@@ -8,6 +8,8 @@ namespace Play.Common.Identity
 {
     public class ConfigureJwtBearerOptions : IConfigureNamedOptions<JwtBearerOptions>
     {
+        private const string AccessTokenParameter = "access_token";
+        private const string MessageHubPath = "/messageHub";
         private readonly IConfiguration configuration;
 
         public ConfigureJwtBearerOptions(IConfiguration configuration)
@@ -28,6 +30,20 @@ namespace Play.Common.Identity
                 {
                     NameClaimType = "name",
                     RoleClaimType = "role"
+                };
+                
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (context.Request.Path.StartsWithSegments(MessageHubPath) &&
+                            context.Request.Query.TryGetValue(AccessTokenParameter, out var accessToken))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return System.Threading.Tasks.Task.CompletedTask;
+                    }
                 };
             }
         }

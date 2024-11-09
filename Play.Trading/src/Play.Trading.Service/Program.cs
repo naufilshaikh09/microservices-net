@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using GreenPipes;
 using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using Play.Common.Identity;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
@@ -11,7 +12,10 @@ using Play.Inventory.Contracts;
 using Play.Trading.Service.Entities;
 using Play.Trading.Service.Exceptions;
 using Play.Trading.Service.Settings;
+using Play.Trading.Service.SignalR;
 using Play.Trading.Service.StateMachines;
+
+const string AllowedOriginSetting = "AllowedOrigin";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +38,10 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>()
+    .AddSingleton<MessageHub>()
+    .AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -41,6 +49,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+    app.UseCors(builder => builder
+        .WithOrigins(app.Configuration[AllowedOriginSetting])
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials());
 }
 
 app.UseHttpsRedirection();
@@ -51,6 +65,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<MessageHub>("/messagehub");
 
 app.Run();
 return;
@@ -86,7 +101,7 @@ void AddMassTransit(IServiceCollection services)
         
         EndpointConvention.Map<GrantItems>(new Uri(queueSettings.GrantItemsQueueAddress));
         EndpointConvention.Map<DebitGil>(new Uri(queueSettings.DebitGillQueueAddress));
-        EndpointConvention.Map<SubtractItems>(new Uri(queueSettings.SubstractItemsQueueAddress));
+        EndpointConvention.Map<SubtractItems>(new Uri(queueSettings.SubtractItemsQueueAddress));
         
         services.AddMassTransitHostedService();
         services.AddGenericRequestClient();

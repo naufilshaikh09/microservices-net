@@ -4,5 +4,5 @@ public class QueueSettings
 {
     public string GrantItemsQueueAddress { get; init; }
     public string DebitGillQueueAddress { get; init; }
-    public string SubstractItemsQueueAddress { get; init; }
+    public string SubtractItemsQueueAddress { get; init; }
 }
