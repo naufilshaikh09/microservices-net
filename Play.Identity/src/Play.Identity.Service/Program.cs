@@ -1,4 +1,3 @@
-using System.Configuration;
 using GreenPipes;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -20,12 +19,14 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
-var identityServerSettings = builder.Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
+var identityServerSettings =
+    builder.Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
 
 builder.Services.Configure<IdentitySettings>(builder.Configuration.GetSection(nameof(IdentitySettings)))
     .AddDefaultIdentity<ApplicationUser>()
     .AddRoles<ApplicationRole>()
-    .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, serviceSettings.ServiceName);
+    .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(mongoDbSettings.ConnectionString,
+        serviceSettings.ServiceName);
 
 builder.Services.AddMassTransitWithRabbitMq(retryConfigurator =>
 {

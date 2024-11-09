@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Play.Common;
 using Play.Inventory.Contracts;
-using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Dtos;
 using Play.Inventory.Service.Entities;
 
@@ -16,8 +15,8 @@ namespace Play.Inventory.Service.Controllers;
 public class ItemsController : ControllerBase
 {
     private const string AdminRole = "Admin";
-    private readonly IRepository<InventoryItem> inventoryItemsRepository;
     private readonly IRepository<CatalogItem> catalogItemsRepository;
+    private readonly IRepository<InventoryItem> inventoryItemsRepository;
     private readonly IPublishEndpoint publishEndpoint;
 
     public ItemsController(

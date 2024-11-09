@@ -8,17 +8,17 @@ namespace Play.Trading.Service.Consumers;
 public class UserUpdatedConsumer : IConsumer<UserUpdated>
 {
     private readonly IRepository<ApplicationUser> _repository;
-    
+
     public UserUpdatedConsumer(IRepository<ApplicationUser> repository)
     {
         _repository = repository;
     }
-    
+
     public async Task Consume(ConsumeContext<UserUpdated> context)
     {
         var message = context.Message;
         var user = await _repository.GetAsync(message.UserId);
-        
+
         if (user == null)
         {
             user = new ApplicationUser

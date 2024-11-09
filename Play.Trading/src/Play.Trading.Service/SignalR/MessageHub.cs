@@ -10,9 +10,7 @@ public class MessageHub : Hub
     public async Task SendStatusAsync(PurchaseState status)
     {
         if (Clients != null)
-        {
             await Clients.User(Context.UserIdentifier)
                 .SendAsync("ReceivePurchaseStatus", status);
-        }
     }
 }

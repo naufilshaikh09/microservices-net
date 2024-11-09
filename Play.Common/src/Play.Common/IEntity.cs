@@ -1,7 +1,6 @@
-namespace Play.Common
+namespace Play.Common;
+
+public interface IEntity
 {
-    public interface IEntity
-    {
-        Guid Id { get; }
-    }
+    Guid Id { get; }
 }

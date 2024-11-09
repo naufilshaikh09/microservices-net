@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Play.Inventory.Service.Dtos;
 
 namespace Play.Inventory.Service.Clients;

@@ -7,81 +7,71 @@ using Play.Identity.Contracts;
 using Play.Identity.Service.Dtos;
 using Play.Identity.Service.Entities;
 
-namespace Play.Identity.Service.Controllers
+namespace Play.Identity.Service.Controllers;
+
+[ApiController]
+[Route("users")]
+[Authorize(Policy = IdentityServerConstants.LocalApi.PolicyName, Roles = Roles.Admin)]
+public class UserController : ControllerBase
 {
-    [ApiController]
-    [Route("users")]
-    [Authorize(Policy = IdentityServerConstants.LocalApi.PolicyName, Roles = Roles.Admin)]
-    public class UserController : ControllerBase
+    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public UserController(UserManager<ApplicationUser> userManager, IPublishEndpoint publishEndpoint)
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IPublishEndpoint _publishEndpoint;
+        _userManager = userManager;
+        _publishEndpoint = publishEndpoint;
+    }
 
-        public UserController(UserManager<ApplicationUser> userManager, IPublishEndpoint publishEndpoint)
-        {
-            _userManager = userManager;
-            _publishEndpoint = publishEndpoint;
-        }
+    [HttpGet]
+    public ActionResult<IEnumerable<UserDto>> GetUsers()
+    {
+        var users = _userManager.Users.ToList()
+            .Select(user => user.AsDto());
 
-        [HttpGet]
-        public ActionResult<IEnumerable<UserDto>> GetUsers()
-        {
-            var users = _userManager.Users.ToList()
-                .Select(user => user.AsDto());
+        return Ok(users);
+    }
 
-            return Ok(users);
-        }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UserDto>> GetUser(Guid id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserDto>> GetUser(Guid id)
-        {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return NotFound();
 
-            if (user is null)
-            {
-                return NotFound();
-            }
+        return user.AsDto();
+    }
 
-            return user.AsDto();
-        }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto dto)
-        {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return NotFound();
 
-            if (user is null)
-            {
-                return NotFound();
-            }
+        user.Email = dto.Email;
+        user.UserName = dto.Email;
+        user.Gil = dto.Gil;
 
-            user.Email = dto.Email;
-            user.UserName = dto.Email;
-            user.Gil = dto.Gil;
+        await _userManager.UpdateAsync(user);
 
-            await _userManager.UpdateAsync(user);
-            
-            await _publishEndpoint.Publish(new UserUpdated(
-                user.Id, user.Email, user.Gil));
+        await _publishEndpoint.Publish(new UserUpdated(
+            user.Id, user.Email, user.Gil));
 
-            return NoContent();
-        }
+        return NoContent();
+    }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(Guid id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
 
-            if (user is null)
-            {
-                return NotFound();
-            }
+        if (user is null) return NotFound();
 
-            await _userManager.DeleteAsync(user);
-            
-            await _publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, 0));
+        await _userManager.DeleteAsync(user);
 
-            return NoContent();
-        }
+        await _publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, 0));
+
+        return NoContent();
     }
 }

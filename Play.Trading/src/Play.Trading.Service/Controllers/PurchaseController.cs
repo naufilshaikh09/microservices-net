@@ -15,15 +15,15 @@ public class PurchaseController : ControllerBase
 {
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly IRequestClient<GetPurchaseState> _purchaseClient;
-    
+
     public PurchaseController(
-        IPublishEndpoint publishEndpoint, 
+        IPublishEndpoint publishEndpoint,
         IRequestClient<GetPurchaseState> purchaseClient)
     {
         _publishEndpoint = publishEndpoint;
         _purchaseClient = purchaseClient;
     }
-    
+
     [HttpGet("status/{idempotencyId}")]
     public async Task<ActionResult<PurchaseDto>> GetStatusAsync(Guid idempotencyId)
     {
@@ -42,17 +42,14 @@ public class PurchaseController : ControllerBase
             purchaseState.Received,
             purchaseState.LastUpdated
         );
-        
-        if (purchaseState.UserId != Guid.Parse(userId))
-        {
-            return Unauthorized();
-        }
+
+        if (purchaseState.UserId != Guid.Parse(userId)) return Unauthorized();
 
         return Ok(purchase);
     }
-    
+
     [HttpPost]
-    public async Task<IActionResult> PostAsync([FromBody]SubmitPurchaseDto purchase)
+    public async Task<IActionResult> PostAsync([FromBody] SubmitPurchaseDto purchase)
     {
         var userId = User.FindFirstValue("sub");
 
@@ -62,11 +59,11 @@ public class PurchaseController : ControllerBase
             purchase.Quantity,
             purchase.IdempotencyId.Value
         );
-        
+
         await _publishEndpoint.Publish(message);
         return AcceptedAtAction(
-            nameof(GetStatusAsync), 
-            new { purchase.IdempotencyId }, 
+            nameof(GetStatusAsync),
+            new { purchase.IdempotencyId },
             new { purchase.IdempotencyId });
     }
 }

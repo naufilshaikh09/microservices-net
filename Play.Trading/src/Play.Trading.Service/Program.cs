@@ -29,11 +29,9 @@ builder.Services.AddMongo()
 
 AddMassTransit(builder.Services);
 
-builder.Services.AddControllers(options =>
-{
-    options.SuppressAsyncSuffixInActionNames = false;   
-})
-.AddJsonOptions(options => options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
+builder.Services.AddControllers(options => { options.SuppressAsyncSuffixInActionNames = false; })
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,7 +47,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+
     app.UseCors(builder => builder
         .WithOrigins(app.Configuration[AllowedOriginSetting])
         .AllowAnyHeader()
@@ -79,7 +77,7 @@ void AddMassTransit(IServiceCollection services)
             retryConfigurator.Interval(3, TimeSpan.FromSeconds(5));
             retryConfigurator.Ignore(typeof(UnknownItemException));
         });
-        
+
         config.AddConsumers(Assembly.GetEntryAssembly());
         config.AddSagaStateMachine<PurchaseStateMachine, PurchaseState>(sagaConfigurator =>
             {
@@ -98,11 +96,11 @@ void AddMassTransit(IServiceCollection services)
 
         var queueSettings = builder.Configuration.GetSection(nameof(QueueSettings))
             .Get<QueueSettings>();
-        
+
         EndpointConvention.Map<GrantItems>(new Uri(queueSettings.GrantItemsQueueAddress));
         EndpointConvention.Map<DebitGil>(new Uri(queueSettings.DebitGillQueueAddress));
         EndpointConvention.Map<SubtractItems>(new Uri(queueSettings.SubtractItemsQueueAddress));
-        
+
         services.AddMassTransitHostedService();
         services.AddGenericRequestClient();
     });

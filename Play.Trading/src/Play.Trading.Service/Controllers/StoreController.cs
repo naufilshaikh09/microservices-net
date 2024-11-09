@@ -13,8 +13,8 @@ namespace Play.Trading.Service.Controllers;
 public class StoreController : ControllerBase
 {
     private readonly IRepository<CatalogItem> _catalogRepository;
-    private readonly IRepository<ApplicationUser> _userRepository;
     private readonly IRepository<InventoryItem> _inventoryRepository;
+    private readonly IRepository<ApplicationUser> _userRepository;
 
     public StoreController(
         IRepository<CatalogItem> catalogRepository,
@@ -29,7 +29,7 @@ public class StoreController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<StoreDto>> GetAsync()
     {
-        string userId = User.FindFirstValue("sub");
+        var userId = User.FindFirstValue("sub");
 
         var catalogItems = await _catalogRepository.GetAllAsync();
         var inventoryItems = await _inventoryRepository.GetAllAsync(

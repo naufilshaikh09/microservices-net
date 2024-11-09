@@ -8,12 +8,12 @@ namespace Play.Trading.Service.Consumers;
 public class InventoryItemUpdatedConsumer : IConsumer<InventoryItemUpdated>
 {
     private readonly IRepository<InventoryItem> _repository;
-    
+
     public InventoryItemUpdatedConsumer(IRepository<InventoryItem> repository)
     {
         _repository = repository;
     }
-    
+
     public async Task Consume(ConsumeContext<InventoryItemUpdated> context)
     {
         var message = context.Message;

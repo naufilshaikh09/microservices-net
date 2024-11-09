@@ -1,7 +1,6 @@
-namespace Play.Common.Settings
+namespace Play.Common.Settings;
+
+public class RabbitMQSettings
 {
-    public class RabbitMQSettings
-    {
-        public string Host { get; init; }
-    }
+    public string Host { get; init; }
 }

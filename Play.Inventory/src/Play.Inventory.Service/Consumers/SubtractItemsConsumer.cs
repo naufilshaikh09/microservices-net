@@ -8,8 +8,8 @@ namespace Play.Inventory.Service.Consumers;
 
 public class SubtractItemsConsumer : IConsumer<SubtractItems>
 {
-    private readonly IRepository<InventoryItem> inventoryItemsRepository;
     private readonly IRepository<CatalogItem> catalogItemsRepository;
+    private readonly IRepository<InventoryItem> inventoryItemsRepository;
 
     public SubtractItemsConsumer(
         IRepository<InventoryItem> inventoryItemsRepository,
